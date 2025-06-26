@@ -9,6 +9,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/sirupsen/logrus"
@@ -28,8 +29,11 @@ func Run() error {
 
 	logger := logrus.New()
 
+	v10 := validator.New()
+
 	userUseCase := usecase.NewUserUseCase(
 		memory.NewInMemoryUserRepo(),
+		cfg.JWTSecret,
 	)
 
 	//main
@@ -40,6 +44,7 @@ func Run() error {
 	// Регистрация маршрутов
 	userRoutes := v1.NewUserRoutes(
 		userUseCase,
+		v10,
 	)
 
 	groupV1 := e.Group("/api/v1")

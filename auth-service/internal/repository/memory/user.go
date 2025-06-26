@@ -3,6 +3,7 @@ package memory
 import (
 	"authjwt/internal/domain"
 	"context"
+	"github.com/pkg/errors"
 	"sync"
 )
 
@@ -23,4 +24,18 @@ func (r *InMemoryUserRepo) CreateUser(_ context.Context, user *domain.User) erro
 	defer r.mu.Unlock()
 	r.users[user.ID] = user
 	return nil
+}
+
+func (r *InMemoryUserRepo) FindByUsername(ctx context.Context, username string) (*domain.User, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	for _, user := range r.users {
+		if user.Username == username {
+			return user, nil
+		}
+	}
+
+	//TODO::Я думаю тут подойдет и такие ошибки
+	return nil, errors.New("user not found")
 }

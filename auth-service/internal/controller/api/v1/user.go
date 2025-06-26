@@ -4,7 +4,8 @@ import (
 	"authjwt/internal/controller"
 	"authjwt/internal/controller/dto"
 	"authjwt/internal/domain"
-	"authjwt/internal/usecase"
+	"fmt"
+	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"net/http"
@@ -13,6 +14,7 @@ import (
 
 type UserRoutes struct {
 	userUC controller.UserUseCase
+	v10    *validator.Validate
 }
 
 type UserResponse struct {
@@ -20,14 +22,17 @@ type UserResponse struct {
 	User *dto.UserResponse `json:"user"`
 }
 
-func NewUserRoutes(uc usecase.UserUseCase) *UserRoutes {
+func NewUserRoutes(uc controller.UserUseCase, v10 *validator.Validate) *UserRoutes {
 	return &UserRoutes{
 		userUC: uc,
+		v10:    v10,
 	}
 }
 
 func (r *UserRoutes) Register(e *echo.Group) {
 	e.POST("/register", r.CreateUser)
+	e.POST("/login", r.Login)
+	e.GET("/validate", r.ValidateToken)
 }
 
 func (r *UserRoutes) CreateUser(c echo.Context) error {
@@ -56,4 +61,37 @@ func (r *UserRoutes) CreateUser(c echo.Context) error {
 		},
 		Response: NewResponse("User created"),
 	})
+}
+
+func (r *UserRoutes) Login(c echo.Context) error {
+	ctx := c.Request().Context()
+	var req dto.LoginRequest
+	if err := c.Bind(&req); err != nil {
+		return ErrorHTTP(c, http.StatusBadRequest, err)
+	}
+	if err := r.v10.Struct(req); err != nil {
+		return ErrorHTTP(c, http.StatusBadRequest, err)
+	}
+
+	user, err := r.userUC.FindByUsername(ctx, req.Username)
+	if err != nil || !user.VerifyPassword(req.Password) {
+		return ErrorHTTP(c, http.StatusUnauthorized, fmt.Errorf("invalid credentials"))
+	}
+
+	token, err := r.userUC.GenerateToken(user)
+	if err != nil {
+		return ErrorHTTP(c, http.StatusInternalServerError, fmt.Errorf("system error"))
+	}
+
+	return c.JSON(http.StatusOK, dto.TokenResponse{AccessToken: token})
+}
+
+func (r *UserRoutes) ValidateToken(c echo.Context) error {
+	h := c.Request().Header.Get("Authorization")
+	valid, err := r.userUC.ValidateToken(h)
+	if err != nil || !valid {
+		return ErrorHTTP(c, http.StatusUnauthorized, err)
+	}
+
+	return SuccessHTTP(c, "User validated")
 }

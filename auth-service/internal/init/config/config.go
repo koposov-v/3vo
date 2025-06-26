@@ -10,6 +10,7 @@ type Config struct {
 	Name                  string        `env:"SERVICE_NAME,required"`
 	GracefulShutdownDelay time.Duration `env:"SERVICE_GRACEFUL_SHUTDOWN_DELAY" envDefault:"5s"`
 	HTTP                  Server
+	JWTSecret             string `env:"JWT_SECRET"`
 }
 
 type Server struct {

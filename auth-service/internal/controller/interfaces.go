@@ -14,4 +14,7 @@ type Router interface {
 
 type UserUseCase interface {
 	CreateUser(ctx context.Context, user *domain.User, password string) error
+	FindByUsername(ctx context.Context, username string) (*domain.User, error)
+	GenerateToken(user *domain.User) (string, error)
+	ValidateToken(h string) (bool, error)
 }

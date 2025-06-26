@@ -10,3 +10,12 @@ type UserResponse struct {
 	Username  string `json:"username"`
 	CreatedAt string `json:"created_at"`
 }
+
+type LoginRequest struct {
+	Username string `json:"username" validate:"required"`
+	Password string `json:"password" validate:"required"`
+}
+
+type TokenResponse struct {
+	AccessToken string `json:"access_token"`
+}
