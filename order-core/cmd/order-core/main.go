@@ -1,8 +1,8 @@
 package main
 
 import (
-	"authjwt/internal/init/app"
 	"log"
+	"order-core/internal/init/app"
 )
 
 func main() {

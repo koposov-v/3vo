@@ -17,8 +17,8 @@ message OrderItem {
   // Название блюда
   string name = 2;
   // Количество единиц блюда
-  int32 quantity = 3;
-  int32 price = 4;
+  uint32 quantity = 3;
+  uint32 price = 4;
 }
 
 message CreateOrderRequest {
@@ -28,14 +28,14 @@ message CreateOrderRequest {
 }
 
 message OrderResponse {
-  uint32 id = 1;
-  uint32 user_id = 2;
+  string id = 1;
+  string user_id = 2;
   repeated OrderItem items = 3;
   optional string comment = 4;
   OrderStatus status = 5;
   string created_at = 6;
   string updated_at = 7;
-  int32 total_price = 8;
+  uint32 total_price = 8;
 }
 
 message GetOrderRequest {
@@ -43,7 +43,7 @@ message GetOrderRequest {
 }
 
 message UpdateOrderRequest {
-  uint32 order_id = 1;
+  string order_id = 1;
   repeated OrderItem items = 2;
   optional string comment = 3;
 }

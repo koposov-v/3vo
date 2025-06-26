@@ -11,6 +11,14 @@ import (
 type Config struct {
 	Name                  string        `env:"SERVICE_NAME,required"`
 	GracefulShutdownDelay time.Duration `env:"SERVICE_GRACEFUL_SHUTDOWN_DELAY" envDefault:"5s"`
+	Grpc                  GRPCServer
+	KitchenServiceAddr    string `env:"KITCHEN_SERVICE_ADDR" envDefault:"kitchen-queue:50052"`
+}
+
+type GRPCServer struct {
+	Host            string        `env:"SERVICE_GRPC_HOST" envDefault:"0.0.0.0"`
+	Port            string        `env:"SERVICE_GRPC_PORT,required"`
+	ShutdownTimeout time.Duration `env:"GRACEFUL_SHUTDOWN_TIMEOUT" envDefault:"20s"`
 }
 
 func Init() (*Config, error) {

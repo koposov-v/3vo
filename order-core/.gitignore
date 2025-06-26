@@ -18,6 +18,7 @@
 
 # Vendor directory (if you don't vendor deps)
 vendor/
+.env
 
 # Generated code
 pkg/**/*.pb.go
