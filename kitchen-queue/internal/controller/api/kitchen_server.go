@@ -23,10 +23,10 @@ func NewKitchenServer(kitchenQueueUC controller.KitchenQueueUC, logger *logrus.L
 }
 
 func (s *KitchenServer) SendToKitchen(ctx context.Context, req *v1.SendToKitchenRequest) (*v1.KitchenStatusResponse, error) {
+	s.logger.Info("Получили заказ")
 	orderKitchen := domain.Order{
 		ID: req.OrderId,
 	}
-	s.logger.Info("Пришло сообщение")
 	s.kitchenQueueUC.SendToQueue(ctx, orderKitchen)
 
 	return &v1.KitchenStatusResponse{}, nil

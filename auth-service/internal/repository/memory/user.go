@@ -39,3 +39,16 @@ func (r *InMemoryUserRepo) FindByUsername(ctx context.Context, username string) 
 	//TODO::Я думаю тут подойдет и такие ошибки
 	return nil, errors.New("user not found")
 }
+
+func (r *InMemoryUserRepo) ExistUser(ctx context.Context, userID string) (bool, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	for _, user := range r.users {
+		if user.ID == userID {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}

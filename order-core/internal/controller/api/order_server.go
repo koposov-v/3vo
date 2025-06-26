@@ -44,6 +44,7 @@ func (c *OrderServer) GetOrder(ctx context.Context, req *v1.GetOrderRequest) (*v
 
 func (c *OrderServer) UpdateOrder(ctx context.Context, req *v1.UpdateOrderRequest) (*v1.OrderResponse, error) {
 	//Todo::можно добавлять разную валидацию еще, но я думаю это и так понятно
+	c.logger.Infof("UpdateOrder")
 	originalOrder, err := c.orderUC.GetOrder(ctx, req.OrderId)
 	if err != nil {
 		return nil, err
@@ -101,6 +102,7 @@ func fromItems(req []*v1.OrderItem) ([]domain.OrderItem, uint32) {
 func fromUpdateOrderRequest(req *v1.UpdateOrderRequest) domain.OrderPatch {
 	items, totalPrice := fromItems(req.Items)
 	return domain.OrderPatch{
+		Status:     int(req.Status),
 		Items:      items,
 		Comment:    req.Comment,
 		TotalPrice: totalPrice,

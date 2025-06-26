@@ -8,6 +8,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+	"github.com/sirupsen/logrus"
 	"net/http"
 	"time"
 )
@@ -19,6 +20,7 @@ import (
 // @BasePath /api/v1
 
 type UserRoutes struct {
+	logger *logrus.Logger
 	userUC controller.UserUseCase
 	v10    *validator.Validate
 }
@@ -28,10 +30,15 @@ type UserResponse struct {
 	User *dto.UserResponse `json:"user"`
 }
 
-func NewUserRoutes(uc controller.UserUseCase, v10 *validator.Validate) *UserRoutes {
+func NewUserRoutes(
+	uc controller.UserUseCase,
+	v10 *validator.Validate,
+	logger *logrus.Logger,
+) *UserRoutes {
 	return &UserRoutes{
 		userUC: uc,
 		v10:    v10,
+		logger: logger,
 	}
 }
 

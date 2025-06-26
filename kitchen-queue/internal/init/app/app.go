@@ -37,7 +37,7 @@ func Run() error {
 	orderClient := orderv1.NewOrderServiceClient(conn)
 
 	// Инициализация usecase
-	kitchenQueueUC := usecase.NewKitchenQueueUseCase(orderClient)
+	kitchenQueueUC := usecase.NewKitchenQueueUseCase(orderClient, logger)
 	kitchenQueueUC.StartWorkers()
 
 	grpcServer := grpc.NewServer()

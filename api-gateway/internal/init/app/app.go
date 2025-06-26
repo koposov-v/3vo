@@ -1,20 +1,18 @@
 package app
 
 import (
-	_ "authjwt/docs"
-	"authjwt/internal/adapter/srv"
-	v1 "authjwt/internal/controller/api/v1"
-	"authjwt/internal/init/config"
-	"authjwt/internal/repository/memory"
-	"authjwt/internal/usecase"
+	"api-gateway/internal/adapter/srv"
+	"api-gateway/internal/controller/api"
+	"api-gateway/internal/init/config"
 	"context"
 	"errors"
 	"fmt"
-	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/sirupsen/logrus"
-	echoSwagger "github.com/swaggo/echo-swagger"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+	orderv1 "kitchen-queue/pkg/order/v1"
 	"net/http"
 	"os"
 	"os/signal"
@@ -31,11 +29,20 @@ func Run() error {
 
 	logger := logrus.New()
 
-	v10 := validator.New()
+	// Инициализация клиента OrderCore
+	conn, err := grpc.NewClient(
+		cfg.OrderCoreServiceAddr,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
+	if err != nil {
+		return fmt.Errorf("dial order service: %w", err)
+	}
+	orderClient := orderv1.NewOrderServiceClient(conn)
 
-	userUseCase := usecase.NewUserUseCase(
-		memory.NewInMemoryUserRepo(),
-		cfg.JWTSecret,
+	gateway := api.NewGateway(
+		orderClient,
+		cfg.AuthServiceURL,
+		logger,
 	)
 
 	//main
@@ -43,17 +50,16 @@ func Run() error {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	e.GET("/swagger/*", echoSwagger.WrapHandler)
+	// Роуты
+	e.POST("/login", gateway.Login)
 
-	// Регистрация маршрутов
-	userRoutes := v1.NewUserRoutes(
-		userUseCase,
-		v10,
-		logger,
-	)
+	orderGroup := e.Group("/order", gateway.AuthMiddleware())
+	orderGroup.GET("/:order_id", gateway.GetOrder)
+	orderGroup.POST("", gateway.CreateOrder)
+	orderGroup.PATCH("", gateway.UpdateOrder)
+	orderGroup.DELETE("/:order_id", gateway.CancelOrder)
 
-	groupV1 := e.Group("/api/v1")
-	userRoutes.Register(groupV1)
+	logger.Infof("Start server on %s:%s", cfg.HTTP.Host, cfg.HTTP.Port)
 	server := srv.NewServer(cfg, e)
 
 	for _, r := range e.Routes() {

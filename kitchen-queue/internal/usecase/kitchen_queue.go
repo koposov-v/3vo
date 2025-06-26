@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"kitchen-queue/internal/domain"
 	orderv1 "kitchen-queue/pkg/order/v1"
 	"sync"
@@ -19,23 +20,28 @@ type KitchenQueueUseCase struct {
 	wg          *sync.WaitGroup
 	queue       chan domain.Order
 	orderClient orderv1.OrderServiceClient
+	logger      *logrus.Logger
 }
 
-func NewKitchenQueueUseCase(orderClient orderv1.OrderServiceClient) *KitchenQueueUseCase {
+func NewKitchenQueueUseCase(orderClient orderv1.OrderServiceClient, logger *logrus.Logger) *KitchenQueueUseCase {
 	return &KitchenQueueUseCase{
 		queue:       make(chan domain.Order),
 		orderClient: orderClient,
 		wg:          &sync.WaitGroup{},
+		logger:      logger,
 	}
 }
 
 func (uc *KitchenQueueUseCase) SendToQueue(ctx context.Context, order domain.Order) {
+	uc.logger.Info("отправили в очередь")
 	uc.queue <- order
 }
 
 func (uc *KitchenQueueUseCase) CloseChannel() {
-	uc.wg.Wait()
-	close(uc.queue)
+	go func() {
+		uc.wg.Wait()
+		close(uc.queue)
+	}()
 }
 
 func (uc *KitchenQueueUseCase) StartWorkers() {
@@ -52,11 +58,13 @@ func (uc *KitchenQueueUseCase) worker() {
 	for order := range uc.queue {
 		for _, st := range statuses {
 			//Имитируем работу, проходился по каждому статусу и выполняем работу -> отправляем в OrderCore
-			time.Sleep(30 * time.Second)
+			time.Sleep(10 * time.Second)
 			_, err := uc.orderClient.UpdateOrder(context.Background(), &orderv1.UpdateOrderRequest{
 				Status:  st,
 				OrderId: order.ID,
 			})
+
+			uc.logger.Infof("Изменили Заказа [%s] на статус %s", order.ID, st.String())
 
 			if err != nil {
 				fmt.Printf("failed to update order %s to status %v: %v\n", order.ID, st, err)

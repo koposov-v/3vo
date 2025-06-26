@@ -42,6 +42,7 @@ func (u *OrderUsecase) CreateOrder(ctx context.Context, order *domain.Order) err
 	}
 
 	order.Status = int(v1.OrderStatus_ORDER_STATUS_CREATED)
+	u.logger.Info("Создали заказ")
 
 	u.SendToKitchen(ctx, order)
 
@@ -81,4 +82,6 @@ func (u *OrderUsecase) SendToKitchen(ctx context.Context, order *domain.Order) {
 	if err != nil {
 		u.logger.Errorf("Failed to send order to kitchen: %v", err)
 	}
+
+	u.logger.Info("Отправили на кухню")
 }

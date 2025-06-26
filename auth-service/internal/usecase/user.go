@@ -13,6 +13,7 @@ import (
 type UserRepository interface {
 	CreateUser(ctx context.Context, user *domain.User) error
 	FindByUsername(ctx context.Context, username string) (*domain.User, error)
+	ExistUser(ctx context.Context, userID string) (bool, error)
 }
 
 type UserUseCase struct {
@@ -68,5 +69,20 @@ func (u UserUseCase) ValidateToken(tokenStr string) (bool, error) {
 	if !tkn.Valid {
 		return false, fmt.Errorf("token is invalid or expired")
 	}
+	claims, ok := tkn.Claims.(jwt.MapClaims)
+	if !ok {
+		return false, fmt.Errorf("cannot parse claims")
+	}
+
+	userID, ok := claims["user_id"].(string)
+	if !ok || userID == "" {
+		return false, fmt.Errorf("user_id not found in token")
+	}
+
+	exist, err := u.repo.ExistUser(context.Background(), userID)
+	if err != nil || !exist {
+		return false, fmt.Errorf("user not found")
+	}
+
 	return true, nil
 }

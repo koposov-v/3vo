@@ -27,6 +27,7 @@ func (o *Order) SetTimestamps() {
 }
 
 type OrderPatch struct {
+	Status     int
 	Items      []OrderItem
 	TotalPrice uint32
 	Comment    *string
@@ -35,6 +36,7 @@ type OrderPatch struct {
 func (o *Order) Patch(patch OrderPatch) {
 	o.Items = patch.Items
 	o.Comment = patch.Comment
+	o.Status = patch.Status
 	o.SetTimestamps()
 }
 
