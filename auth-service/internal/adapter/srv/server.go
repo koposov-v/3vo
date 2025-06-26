@@ -15,6 +15,7 @@ func NewServer(cfg *config.Config, handler http.Handler) Server {
 	httpCfg := cfg.HTTP
 
 	return &server{
+		config: cfg,
 		server: &http.Server{
 			Addr:    httpCfg.Host + ":" + httpCfg.Port,
 			Handler: handler,

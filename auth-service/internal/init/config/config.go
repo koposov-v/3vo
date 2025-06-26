@@ -1,8 +1,10 @@
 package config
 
 import (
+	"fmt"
 	"github.com/caarlos0/env/v11"
 	"github.com/joho/godotenv"
+	"os"
 	"time"
 )
 
@@ -21,7 +23,12 @@ type Server struct {
 
 func Init() (*Config, error) {
 	var cfg Config
-	err := godotenv.Load("../../../.env")
+
+	if _, err := os.Stat(".env"); os.IsNotExist(err) {
+		return nil, fmt.Errorf("failed to find .env file at path: .env")
+	}
+
+	err := godotenv.Load(".env")
 	if err != nil {
 		return nil, err
 	}
