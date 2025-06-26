@@ -24,3 +24,15 @@ tasks:
         --go_out=api-gateway/pkg --go_opt=paths=source_relative \
         --go-grpc_out=api-gateway/pkg --go-grpc_opt=paths=source_relative \
         api-gateway/vendor.api/order/v1/order.proto
+
+  proto-gen-kitchen:
+    desc: "Генерация protobuf файлов в сервисе Kitchen Service"
+    cmds:
+      - |
+        protoc \
+        -I kitchen-queue/vendor.api \
+        -I kitchen-queue/api \
+        --go_out=kitchen-queue/pkg --go_opt=paths=source_relative \
+        --go-grpc_out=kitchen-queue/pkg --go-grpc_opt=paths=source_relative \
+        kitchen-queue/vendor.api/order/v1/order.proto \
+        kitchen-queue/api/v1/kitchen.proto

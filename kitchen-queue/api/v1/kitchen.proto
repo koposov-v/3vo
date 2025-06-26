@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package kitchen.v1;
+
+option go_package = "kitchen-queue/pkg/v1/kitchen";
+
+service KitchenService {
+  // Отправка заказа на кухню для обработки
+  rpc SendToKitchen(SendToKitchenRequest) returns (KitchenStatusResponse);
+}
+
+message OrderItem {
+  string id = 1;
+  string name = 2;
+  uint32 quantity = 3;
+}
+
+message SendToKitchenRequest {
+  string order_id = 1;
+  repeated OrderItem items = 2;
+  optional string comment = 3;
+}
+
+// Ответ на отправку заказа
+message KitchenStatusResponse {
+  //  TODO::Вроде ничего отправлять не надо
+}
