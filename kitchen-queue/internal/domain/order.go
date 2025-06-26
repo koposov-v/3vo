@@ -1,14 +1,6 @@
 package domain
 
 type Order struct {
-	ID      string
-	Items   []OrderItem
-	Comment *string
-}
-
-type OrderItem struct {
-	ID       string
-	Name     string
-	Quantity uint32
-	Price    uint32
+	ID string
+	//	в будущем еще что-то будет наверно
 }

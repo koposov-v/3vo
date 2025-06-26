@@ -6,7 +6,7 @@
 *.dylib
 *.test
 *.out
-
+__debug_*
 # Build artifacts
 /bin/
 /dist/

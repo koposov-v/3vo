@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"github.com/sirupsen/logrus"
+	kitchenv1 "kitchen-queue/pkg/v1"
 	"order-core/internal/domain"
 	"order-core/internal/repository/memory"
 	v1 "order-core/pkg/v1"
@@ -15,14 +16,20 @@ type OrderRepository interface {
 }
 
 type OrderUsecase struct {
-	repo   OrderRepository
-	logger *logrus.Logger
+	repo          OrderRepository
+	kitchenClient kitchenv1.KitchenServiceClient
+	logger        *logrus.Logger
 }
 
-func NewOrderUsecase(repo *memory.OrderRepository, logger *logrus.Logger) *OrderUsecase {
+func NewOrderUsecase(
+	repo *memory.OrderRepository,
+	kitchenClient kitchenv1.KitchenServiceClient,
+	logger *logrus.Logger,
+) *OrderUsecase {
 	return &OrderUsecase{
-		repo:   repo,
-		logger: logger,
+		repo:          repo,
+		kitchenClient: kitchenClient,
+		logger:        logger,
 	}
 }
 
@@ -34,9 +41,10 @@ func (u *OrderUsecase) CreateOrder(ctx context.Context, order *domain.Order) err
 		return err
 	}
 
+	order.Status = int(v1.OrderStatus_ORDER_STATUS_CREATED)
+
 	u.SendToKitchen(ctx, order)
 
-	order.Status = int(v1.OrderStatus_ORDER_STATUS_CREATED)
 	return nil
 }
 
@@ -65,10 +73,12 @@ func (u *OrderUsecase) CancelOrder(ctx context.Context, order *domain.Order) err
 }
 
 func (u *OrderUsecase) SendToKitchen(ctx context.Context, order *domain.Order) {
-	//kitchenReq := &v1.KitchenOrderRequest{OrderId: order.ID, Items: req.Items}
-	//_, err := u.kitchenClient.SendToKitchen(ctx, kitchenReq)
-	//if err != nil {
-	//	u.logger.Errorf("Failed to send order to kitchen: %v", err)
-	//	return err
-	//}
+	ctx = context.Background()
+	kitchenReq := &kitchenv1.SendToKitchenRequest{
+		OrderId: order.ID,
+	}
+	_, err := u.kitchenClient.SendToKitchen(ctx, kitchenReq)
+	if err != nil {
+		u.logger.Errorf("Failed to send order to kitchen: %v", err)
+	}
 }

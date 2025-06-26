@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
 	"kitchen-queue/internal/controller/api"
 	"kitchen-queue/internal/init/config"
@@ -26,7 +27,10 @@ func Run() error {
 	logger := logrus.New()
 
 	// Инициализация клиента OrderCore
-	conn, err := grpc.NewClient(cfg.OrderCoreServiceAddr)
+	conn, err := grpc.NewClient(
+		cfg.OrderCoreServiceAddr,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
 	if err != nil {
 		return fmt.Errorf("dial order service: %w", err)
 	}
@@ -34,6 +38,7 @@ func Run() error {
 
 	// Инициализация usecase
 	kitchenQueueUC := usecase.NewKitchenQueueUseCase(orderClient)
+	kitchenQueueUC.StartWorkers()
 
 	grpcServer := grpc.NewServer()
 	v1.RegisterKitchenServiceServer(

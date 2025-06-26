@@ -11,10 +11,12 @@ tasks:
     cmds:
       - |
         protoc \
-        -I ./order-core/api \
-        --go_out ./order-core/pkg/ --go_opt paths=source_relative \
-        --go-grpc_out ./order-core/pkg/ --go-grpc_opt paths=source_relative \
-        ./order-core/api/v1/*.proto
+          -I order-core/api \
+          -I order-core/vendor.api \
+          --go_out=order-core/pkg --go_opt=paths=source_relative \
+          --go-grpc_out=order-core/pkg --go-grpc_opt=paths=source_relative \
+          order-core/api/v1/order.proto \
+          order-core/vendor.api/kitchen/v1/kitchen.proto
   proto-gen-gateway:
     desc: "Генерация protobuf файлов в сервисе API Gateway"
     cmds:

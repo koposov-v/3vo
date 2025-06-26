@@ -38,23 +38,29 @@ func (uc *KitchenQueueUseCase) CloseChannel() {
 	close(uc.queue)
 }
 
-func (uc *KitchenQueueUseCase) worker() {
-	for order := range uc.queue {
+func (uc *KitchenQueueUseCase) StartWorkers() {
+	for range 10 {
 		uc.wg.Add(1)
 		go func() {
 			defer uc.wg.Done()
-			for _, st := range statuses {
-				//Имитируем работу, проходился по каждому статусу и выполняем работу -> отправляем в OrderCore
-				time.Sleep(30 * time.Second)
-				_, err := uc.orderClient.UpdateOrder(context.Background(), &orderv1.UpdateOrderRequest{
-					Status:  st,
-					OrderId: order.ID,
-				})
-
-				if err != nil {
-					fmt.Printf("failed to update order %s to status %v: %v\n", order.ID, st, err)
-				}
-			}
+			uc.worker()
 		}()
+	}
+}
+
+func (uc *KitchenQueueUseCase) worker() {
+	for order := range uc.queue {
+		for _, st := range statuses {
+			//Имитируем работу, проходился по каждому статусу и выполняем работу -> отправляем в OrderCore
+			time.Sleep(30 * time.Second)
+			_, err := uc.orderClient.UpdateOrder(context.Background(), &orderv1.UpdateOrderRequest{
+				Status:  st,
+				OrderId: order.ID,
+			})
+
+			if err != nil {
+				fmt.Printf("failed to update order %s to status %v: %v\n", order.ID, st, err)
+			}
+		}
 	}
 }
