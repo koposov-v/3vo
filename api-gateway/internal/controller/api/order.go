@@ -2,9 +2,9 @@ package api
 
 import (
 	"api-gateway/internal/controller/dto"
+	orderv1 "api-gateway/pkg/order/v1"
 	"fmt"
 	"github.com/labstack/echo/v4"
-	orderv1 "kitchen-queue/pkg/order/v1"
 	"net/http"
 )
 

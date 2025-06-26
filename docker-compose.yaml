@@ -1,0 +1,56 @@
+version: "3.9"
+
+services:
+  api-gateway:
+    container_name: api-gateway
+    build:
+      context: ./api-gateway
+      dockerfile: build/Dockerfile
+    ports:
+      - "${API_GATEWAY_PORT:-9934}:${API_GATEWAY_PORT:-9934}"
+    env_file:
+      - ./api-gateway/.env
+    networks:
+      - app-net
+    command: /bin/sh -c "tail -f /dev/null"
+
+  auth-service:
+    container_name: auth-service
+    build:
+      context: ./auth-service
+      dockerfile: build/Dockerfile
+    ports:
+      - "${AUTH_SERVICE_PORT:-9900}:${AUTH_SERVICE_PORT:-9900}"
+    env_file:
+      - ./auth-service/.env
+    networks:
+      - app-net
+    command: /bin/sh -c "tail -f /dev/null"
+
+  order-core:
+    container_name: order-core
+    build:
+      context: ./order-core
+      dockerfile: build/Dockerfile
+    ports:
+      - "${ORDER_CORE_PORT:-9920}:${ORDER_CORE_PORT:-9920}"
+    env_file:
+      - ./order-core/.env
+    networks:
+      - app-net
+
+  kitchen-queue:
+    container_name: kitchen-queue
+    build:
+      context: ./kitchen-queue
+      dockerfile: build/Dockerfile
+    ports:
+      - "${KITCHEN_QUEUE_PORT:-9921}:${KITCHEN_QUEUE_PORT:-9921}"
+    env_file:
+      - ./kitchen-queue/.env
+    networks:
+      - app-net
+
+networks:
+  app-net:
+    driver: bridge

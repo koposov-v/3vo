@@ -1,8 +1,8 @@
 package api
 
 import (
+	orderv1 "api-gateway/pkg/order/v1"
 	"github.com/sirupsen/logrus"
-	orderv1 "kitchen-queue/pkg/order/v1"
 	"net/http"
 )
 

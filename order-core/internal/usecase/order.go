@@ -3,9 +3,9 @@ package usecase
 import (
 	"context"
 	"github.com/sirupsen/logrus"
-	kitchenv1 "kitchen-queue/pkg/v1"
 	"order-core/internal/domain"
 	"order-core/internal/repository/memory"
+	kitchenv1 "order-core/pkg/kitchen/v1"
 	v1 "order-core/pkg/v1"
 )
 
