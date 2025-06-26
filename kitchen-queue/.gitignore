@@ -8,7 +8,6 @@
 *.out
 
 # Build artifacts
-/build/
 /bin/
 /dist/
 

@@ -8,13 +8,11 @@
 *.out
 
 # Build artifacts
-/build/
 /bin/
 /dist/
 
 # Go stuff
 /go.sum
-/go.work
 *.mod~
 
 # Vendor directory (if you don't vendor deps)
