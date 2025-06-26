@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+package order.v1;
+
+option go_package = "order-core/pkg/v1/order";
+
+service OrderService {
+  rpc CreateOrder(CreateOrderRequest) returns (OrderResponse);
+  rpc GetOrder(GetOrderRequest) returns (OrderResponse);
+  rpc UpdateOrder(UpdateOrderRequest) returns (OrderResponse);
+  rpc CancelOrder(CancelOrderRequest) returns (OrderResponse);
+}
+
+message OrderItem {
+  // ID позиции меню
+  string id = 1;
+  // Название блюда
+  string name = 2;
+  // Количество единиц блюда
+  int32 quantity = 3;
+  int32 price = 4;
+}
+
+message CreateOrderRequest {
+  string user_id = 1;
+  repeated OrderItem items = 2;
+  string comment = 3;
+}
+
+message OrderResponse {
+  uint32 id = 1;
+  uint32 user_id = 2;
+  repeated OrderItem items = 3;
+  optional string comment = 4;
+  OrderStatus status = 5;
+  string created_at = 6;
+  string updated_at = 7;
+  int32 total_price = 8;
+}
+
+message GetOrderRequest {
+  string order_id = 1;
+}
+
+message UpdateOrderRequest {
+  uint32 order_id = 1;
+  repeated OrderItem items = 2;
+  optional string comment = 3;
+}
+
+message CancelOrderRequest {
+  string order_id = 1;
+  string reason = 2;
+}
+
+enum OrderStatus {
+  ORDER_STATUS_UNSPECIFIED = 0;
+  // Заказ создан
+  ORDER_STATUS_CREATED = 1;
+  // Заказ подтверждён
+  ORDER_STATUS_CONFIRMED = 2;
+  // Заказ готовится
+  ORDER_STATUS_PREPARING = 3;
+  // Заказ доставлен
+  ORDER_STATUS_DELIVERED = 4;
+  // Заказ отменён
+  ORDER_STATUS_CANCELLED = 5;
+}

@@ -1,0 +1,49 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Build artifacts
+/build/
+/bin/
+/dist/
+
+# Go stuff
+/go.sum
+/go.work
+*.mod~
+
+# Vendor directory (if you don't vendor deps)
+vendor/
+
+# Generated code
+pkg/**/*.pb.go
+pkg/**/*.pb.gw.go
+pkg/**/*.pb.validate.go
+
+# IDE/Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Logs & temp files
+*.log
+*.tmp
+*.bak
+
+# Task/Make artifacts
+.task/
+.cache/
+
+# Coverage
+coverage.out
+*.coverprofile
+
+# Protobuf cache (optional)
+protoc-gen-*
