@@ -21,7 +21,7 @@ type UserUseCase struct {
 }
 
 func NewUserUseCase(repo UserRepository, jwtSecret string) UserUseCase {
-	return UserUseCase{repo: repo}
+	return UserUseCase{repo: repo, jwtSecret: jwtSecret}
 }
 
 func (u UserUseCase) CreateUser(ctx context.Context, user *domain.User, password string) error {
@@ -60,7 +60,7 @@ func (u UserUseCase) ValidateToken(tokenStr string) (bool, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
 		}
-		return u.jwtSecret, nil
+		return []byte(u.jwtSecret), nil
 	})
 	if err != nil {
 		return false, fmt.Errorf("invalid token: %w", err)

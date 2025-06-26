@@ -5,9 +5,10 @@ import (
 	"net/http"
 )
 
+// Response represents a generic API response
 type Response struct {
-	Message string  `json:"message"`
-	Error   *string `json:"error,omitempty"`
+	Message string  `json:"message" example:"User created"`
+	Error   *string `json:"error,omitempty" example:"failed"`
 }
 
 func NewResponse(msg string) Response {

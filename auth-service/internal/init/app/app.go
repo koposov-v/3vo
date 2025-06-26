@@ -1,6 +1,7 @@
 package app
 
 import (
+	_ "authjwt/docs"
 	"authjwt/internal/adapter/srv"
 	v1 "authjwt/internal/controller/api/v1"
 	"authjwt/internal/init/config"
@@ -13,6 +14,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/sirupsen/logrus"
+	echoSwagger "github.com/swaggo/echo-swagger"
 	"net/http"
 	"os"
 	"os/signal"
@@ -40,6 +42,8 @@ func Run() error {
 	e := echo.New()
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
+
+	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
 	// Регистрация маршрутов
 	userRoutes := v1.NewUserRoutes(
