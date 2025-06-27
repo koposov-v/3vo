@@ -1,10 +1,24 @@
 version: "3"
 
-
-vars:
 tasks:
   default:
     cmd: task --list
+
+  up:
+    desc: "Запуск всех сервисов в фоне"
+    cmds:
+      - docker compose up
+
+  init-envs:
+    desc: "Создание .env файлов из env.example через init-envs.sh"
+    cmds:
+      - ./scripts/init-envs.sh
+
+  build:
+    desc: "Сборка проекта"
+    deps: [ init-envs ]
+    cmds:
+      - docker compose build
 
   proto-gen-order-core:
     desc: "Генерация protobuf файлов в сервисе OrderCore"
