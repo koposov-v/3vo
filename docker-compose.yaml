@@ -12,7 +12,6 @@ services:
       - ./api-gateway/.env
     networks:
       - app-net
-    command: /bin/sh -c "tail -f /dev/null"
 
   auth-service:
     container_name: auth-service
@@ -25,7 +24,6 @@ services:
       - ./auth-service/.env
     networks:
       - app-net
-    command: /bin/sh -c "tail -f /dev/null"
 
   order-core:
     container_name: order-core

@@ -24,13 +24,15 @@ type Server struct {
 func Init() (*Config, error) {
 	var cfg Config
 
-	if _, err := os.Stat(".env"); os.IsNotExist(err) {
-		return nil, fmt.Errorf("failed to find .env file at path: .env")
-	}
+	if os.Getenv("ENVIRONMENT") != "prod" {
+		if _, err := os.Stat(".env"); os.IsNotExist(err) {
+			return nil, fmt.Errorf("failed to find .env file at path: .env")
+		}
 
-	err := godotenv.Load(".env")
-	if err != nil {
-		return nil, err
+		err := godotenv.Load(".env")
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	if err := env.Parse(&cfg); err != nil {
